@@ -2,19 +2,24 @@ local f = CreateFrame("Frame")
 
 
 local function main()
-  f:SetScript("OnEvent", f.PET_BATTLE_CAPTURED)
+  f:SetScript("OnEvent", f.Event)
+  f:RegisterEvent("CHAT_MSG_PET_BATTLE_INFO")
+  -- XXX I could, after this, register for chat messages and parse that
+  f:RegisterEvent("COMPANION_LEARNED")
   f:RegisterEvent("PET_BATTLE_CAPTURED")
 end
 
 
-function f:PET_BATTLE_CAPTURED(...)
+function f:Event(...)
   print(...)
-  self:Scan()
+  -- XXX
+  --self:Scan()
 end
 
 
 -- scan through pets checking for any sets of three
 function f:Scan()
+  -- XXX is it possible to do this without messing with my filters?
   C_PetJournal.ClearSearchFilter()
   C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_COLLECTED, true)
   C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_NOT_COLLECTED, false)
