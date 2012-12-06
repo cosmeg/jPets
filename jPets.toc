@@ -1,0 +1,8 @@
+## Interface: 50100
+## Author: me
+## Title: jPets
+## Notes: Pet stuff
+
+## LoadManagers: AddonLoader
+
+code.lua
