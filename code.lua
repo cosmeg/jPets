@@ -11,7 +11,7 @@ end
 
 
 function f:Event(event, ...)
-  print(event, ...)
+  --print(event, ...)
   --self:Scan()  -- XXX
   if self[event] then
     self[event](self, ...)
@@ -20,16 +20,16 @@ end
 
 
 function f:CHAT_MSG_PET_BATTLE_INFO(msg, ...)
-  print(msg)
+  --print(msg)
   local pattern = "You have captured enemy "
   local pos = strfind(msg, pattern)
   --BATTLE_PET_COMBAT_LOG_CAPTURED
   if pos then
     pos = pos + #pattern
-    print(pos)
+    --print(pos)
     local name = strsub(msg, pos)
-    print(name)
-    print(strsub(msg, pos + 1))
+    --print(name)
+    --print(strsub(msg, pos + 1))
   end
 end
 
