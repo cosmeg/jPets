@@ -4,6 +4,10 @@ local f = CreateFrame("Frame")
 local function main()
   f:SetScript("OnEvent", function(self, event, ...) f[event](self, ...) end)
   f:RegisterEvent("PET_BATTLE_CAPTURED")
+
+  -- This is not needed every time as long as you pay attention to the
+  -- after-capture warnings.
+  --f:FullScan()
 end
 
 
@@ -35,6 +39,21 @@ function f:CHAT_MSG_SYSTEM(msg, ...)
   local count = tonumber(owned:sub(pos, pos))
   if count == 3 then
     print("WARNING: You now have the maximum number of "..link)
+  end
+end
+
+
+function f:FullScan()
+  local _, num = C_PetJournal.GetNumPets(true)
+  print(num)
+  for i = 1, num do
+    local _, speciesID, _, _, _, _, _, speciesName = C_PetJournal.GetPetInfoByIndex(i, false)
+    local owned = C_PetJournal.GetOwnedBattlePetString(speciesID)
+    pos = owned:find("/") - 1
+    local count = tonumber(owned:sub(pos, pos))
+    if count >= 3 then
+      print("WARNING: You have the maximum number of "..speciesName)
+    end
   end
 end
 
