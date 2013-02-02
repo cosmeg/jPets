@@ -1,59 +1,63 @@
+-- TODO: scan the tooltip [Fawn] has been added to your pet journal!
+--       says "Collected (2/3)"
+--       what event is this?
+
+
 local f = CreateFrame("Frame")
 
 
 local function main()
-  f:SetScript("OnEvent", f.Event)
-  f:RegisterEvent("CHAT_MSG_PET_BATTLE_INFO")
-  -- XXX I could, after this, register for chat messages and parse that
-  f:RegisterEvent("COMPANION_LEARNED")
+  f:SetScript("OnEvent", function(self, event, ...) f[event](self, ...) end)
   f:RegisterEvent("PET_BATTLE_CAPTURED")
 end
 
 
-function f:Event(event, ...)
-  --print(event, ...)
-  --self:Scan()  -- XXX
-  if self[event] then
-    self[event](self, ...)
-  end
+function f:PET_BATTLE_CAPTURED(...)
+  self:RegisterEvent("CHAT_MSG_SYSTEM")
 end
 
 
-function f:CHAT_MSG_PET_BATTLE_INFO(msg, ...)
-  --print(msg)
-  local pattern = "You have captured enemy "
+function f:CHAT_MSG_SYSTEM(msg, ...)
+  -- This assumes the capture info is the *next* system message.
+  self:UnregisterEvent("CHAT_MSG_SYSTEM")
+
+  print(msg)
+
+  -- the link is at the front
+  local pattern = " has been added to your pet journal!"
   local pos = strfind(msg, pattern)
-  --BATTLE_PET_COMBAT_LOG_CAPTURED
   if pos then
-    pos = pos + #pattern
-    --print(pos)
-    local name = strsub(msg, pos)
-    --print(name)
-    --print(strsub(msg, pos + 1))
-  end
-end
+    local link = strsub(msg, 1, pos - 1)
+    print(link)
 
+    --[[
+    -- http://wowprogramming.com/snippets/Scan_a_tooltip_15
+    local tooltip = CreateFrame("GameTooltip", "JPetTooltip", UIParent,
+                                "GameTooltipTemplate")
+    tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+    -- XXX it doesn't like this: "Unknown link type"
+    tooltip:SetHyperlink(link)
+    print(tooltip:NumLines())
+    print(JPetTooltipTextLeft2:GetText())
+    --]]
 
--- scan through pets checking for any sets of three
-function f:Scan()
-  -- XXX is it possible to do this without messing with my filters?
-  C_PetJournal.ClearSearchFilter()
-  C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_COLLECTED, true)
-  C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_NOT_COLLECTED, false)
-  local _, numOwned = C_PetJournal.GetNumPets(true)
+    -- Note this link is wrapped in a colorstring.
+    -- http://wowprogramming.com/docs/api_types#colorString
+    -- example:
+    -- |cff0070dd|Hbattlepet:397:20:3:1192:218:231:0000000001838B0E|h[Skunk]|h
+    -- speciesID, level, breedQuality, maxHealth, power, speed, battlePetID
 
-  local pets = { }
-
-  for i = 1, numOwned do
-    local petID, speciesID, isOwned, customName, level, favorite, isRevoked, name, icon, petType, creatureID, sourceText, description, isWildPet, canBattle = C_PetJournal.GetPetInfoByIndex(i)
-    if isWildPet then
-      pets[name] = 1 + (pets[name] or 0)
-    end
-  end
-
-  for name, count in pairs(pets) do
-    if count >= 3 then
-      print(name)
+    local _, speciesID = strsplit(":", link)
+    print(speciesID)
+    local owned = C_PetJournal.GetOwnedBattlePetString(speciesID)
+    print(owned)
+    -- Note this is *not* a number, but the string to be shown in the tooltip.
+    -- Also wrapped in a colorstring.
+    pos = owned:find("/") - 1
+    local count = tonumber(owned:sub(pos, pos))
+    print(count)
+    if count == 3 then
+      print("WARNING: You now have the maximum number of "..link)
     end
   end
 end

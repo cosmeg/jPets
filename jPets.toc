@@ -2,4 +2,8 @@
 ## Author: me
 ## Title: jPets
 ## Notes: Pet stuff
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+
 code.lua
