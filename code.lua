@@ -8,6 +8,8 @@ local function main()
   -- This is not needed every time as long as you pay attention to the
   -- after-capture warnings.
   --f:FullScan()
+
+  f:MovePetBattleFrame()
 end
 
 
@@ -58,27 +60,11 @@ function f:FullScan()
 end
 
 
--- make local (method)
--- /run JMovePetBattleFrame()
--- /dump PetBattleFrame:GetPoint(1)
-function JMovePetBattleFrame()
+function f:MovePetBattleFrame()
   local pbf = PetBattleFrame.BottomFrame
-  -- I'm not sure why there are 2 points here.
   local point, relativeTo, relativePoint, xOffset, yOffset = pbf:GetPoint(1)
   pbf:ClearAllPoints()
-  -- this isn't working. is it because of the "FrameLock"?
-  -- actually, it could be because the PetBattleFrame takes up the entire
-  -- screen...
-  -- /dump PetBattleFrame:GetWidth() => 1480
-  -- I think this is the case
   pbf:SetPoint(point, relativeTo, relativePoint, xOffset + 200, yOffset)
-  -- is there a sub-frame? possibly un-named
-  -- /dump GetChildrenTree(PetBattleFrame, 0)
-  -- there's a LOT of shit here
-  -- I think the best bet now is to look at the code:
-  -- http://wowprogramming.com/utils/xmlbrowser/test/AddOns/Blizzard_PetBattleUI/Blizzard_PetBattleUI.lua
-  -- /dump GetChildrenTree(PetBattleFrame.BottomFrame, 0)
-  -- /dump GetChildrenTree(PetBattleFrame.BottomFrame.FlowFrame, 0)
 end
 
 
